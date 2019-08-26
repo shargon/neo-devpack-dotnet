@@ -324,7 +324,7 @@ namespace Neo.Compiler.MSIL
             _insertEndCode(to, null);
             //if go here,mean methodname is wrong
             //use throw to instead ret,make vm  fault.
-            _Insert1(VM.OpCode.THROW,"",to);
+            _Insert1(VM.OpCode.THROW, "", to);
             //_Insert1(VM.OpCode.RET, "", to);
 
             //convert all Jmp
@@ -881,7 +881,7 @@ namespace Neo.Compiler.MSIL
                 //call
                 case CodeEx.Call:
                 case CodeEx.Callvirt:
-                    _ConvertCall(src, to);
+                    _ConvertCall(inModule, src, to);
                     break;
 
                 //用上一个参数作为数量，new 一个数组

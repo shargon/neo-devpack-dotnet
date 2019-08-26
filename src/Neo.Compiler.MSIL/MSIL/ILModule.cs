@@ -1,5 +1,8 @@
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 /// <summary>
 /// 这个文件负责 IL dll的解析，核心解析是使用mono.cecil,这里进行了一些预先整理
@@ -13,6 +16,8 @@ namespace Neo.Compiler.MSIL
         public List<string> moduleref = new List<string>();
         public Dictionary<string, ILType> mapType = new Dictionary<string, ILType>();
         public ILogger logger;
+        public ModuleDefinition frameWorkModule;
+        public ILType frameWorkHelperType;
         public ILModule(ILogger _logger = null)
         {
             this.logger = _logger;
@@ -36,6 +41,14 @@ namespace Neo.Compiler.MSIL
                         moduleref.Add(ar.Name);
                     if (moduleref.Contains(ar.FullName) == false)
                         moduleref.Add(ar.FullName);
+
+                    // Check switch reference
+                    if (ar.Name == "Neo.SmartContract.Framework")
+                    {
+                        frameWorkModule = ModuleDefinition.ReadModule("Neo.SmartContract.Framework.dll");
+                        var type = frameWorkModule.Types.Where(u => u.FullName == "Neo.SmartContract.Framework.Helper").FirstOrDefault();
+                        frameWorkHelperType = new ILType(this, type, logger);
+                    }
                 }
             }
             //mapModule[module.Name] = module;

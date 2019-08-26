@@ -6,6 +6,25 @@ namespace Neo.SmartContract.Framework
     public static class Helper
     {
         /// <summary>
+        /// Compute string hash, used for switch
+        /// </summary>
+        /// <param name="s">String</param>
+        /// <returns>Unit hashed value</returns>
+        internal static uint ComputeStringHash(string s)
+        {
+            uint num = new uint();
+            if (s != null)
+            {
+                num = 0x811c9dc5;
+                for (int i = 0; i < s.Length; i++)
+                {
+                    num = (s[i] ^ num) * 0x1000193;
+                }
+            }
+            return num;
+        }
+
+        /// <summary>
         /// Converts byte to byte[].
         /// </summary>
         [Script]

@@ -462,7 +462,7 @@ namespace Neo.Compiler.MSIL
             name = "Notify";
             return false;
         }
-        private int _ConvertCall(OpCode src, NeoMethod to)
+        private int _ConvertCall(ILModule module, OpCode src, NeoMethod to)
         {
             Mono.Cecil.MethodReference refs = src.tokenUnknown as Mono.Cecil.MethodReference;
 
@@ -768,13 +768,15 @@ namespace Neo.Compiler.MSIL
                 }
                 else if (src.tokenMethod == "System.UInt32 <PrivateImplementationDetails>::ComputeStringHash(System.String)")
                 {
-                    throw new Exception("not supported on neovm now.");
-                    // 需要neo.vm nuget更新以后，这个才可以放开，就可以处理 string switch了。");
+                    src.tokenMethod = "System.UInt32 Neo.SmartContract.Framework.Helper::ComputeStringHash(System.String)";
+                    src.tokenUnknown = module.frameWorkHelperType.methods
+                        .Values.Where(u => u.method.FullName == src.tokenMethod)
+                        .Select(u => u.method)
+                        .FirstOrDefault();
 
-                    //_Convert1by1(VM.OpCode.CSHARPSTRHASH32, src, to);
-                    //return 0;
+                    return _ConvertCall(module, src, to);
                 }
-                else if(src.tokenMethod.Contains("::op_LeftShift("))
+                else if (src.tokenMethod.Contains("::op_LeftShift("))
                 {
                     _Convert1by1(VM.OpCode.SHL, src, to);
                     return 0;
